@@ -1,0 +1,282 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>Fantasyfighter</title>
+<!-- Standardised web app manifest -->
+<link rel="manifest" href="app.manifest" />
+
+<!-- Allow fullscreen mode on iOS devices. (These are Apple specific meta tags.) -->
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<link rel="apple-touch-icon" sizes="256x256" href="icon-256.png" />
+<meta name="HandheldFriendly" content="true" />
+
+<!-- Chrome for Android web app tags -->
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="shortcut icon" sizes="256x256" href="icon-256.png" />
+<script type="text/javascript" charset="utf-8" src="../../../cordova.js"></script>
+<script type="text/javascript" charset="utf-8">
+	document.addEventListener("deviceready", onDeviceReady, false);
+	function onDeviceReady() {
+		document.addEventListener("backbutton", onBackKeyDown, false);
+	}
+	function onBackKeyDown() {
+
+	}
+</script>
+
+<!-- All margins and padding must be zero for the canvas to fill the screen. -->
+<style type="text/css">
+* {
+	padding: 0;
+	margin: 0;
+}
+
+html, body {
+	background: #000;
+	color: #fff;
+	overflow: hidden;
+	touch-action: none;
+	-ms-touch-action: none;
+}
+
+canvas {
+	touch-action-delay: none;
+	touch-action: none;
+	-ms-touch-action: none;
+}
+</style>
+<style>
+body {
+	text-align: center;
+	background: #000000;
+	padding: 0;
+	border: 0;
+	margin: 0;
+	height: 100%;
+}
+
+html {
+	-ms-touch-action: none;
+	/* Direct all pointer events to JavaScript code. */
+}
+
+.sbgshow {
+	display: block;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	color: #fff;
+	font-size: 30px;
+	line-height: 1.7em;
+	background: rgba(0, 0, 0, 0.85);
+}
+
+.sbgshow .arron {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 100px;
+	height: 100px;
+	background: url(./img/arron.png) no-repeat;
+	background-size: 100px 100px;
+}
+
+.sbgshow p {
+	padding-top: 78px;
+}
+
+.sbg {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	color: #fff;
+	font-size: 26px;
+	line-height: 1.7em;
+	background: rgba(0, 0, 0, 0.85);
+}
+
+.sbg .arron {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 100px;
+	height: 100px;
+	background: url(./img/arron.png) no-repeat;
+	background-size: 100px 100px;
+}
+
+.sbg p {
+	padding-top: 78px;
+}
+</style>
+
+</head>
+
+<body>
+
+	<div id="c2canvasdiv">
+		<canvas id="c2canvas" width="428" height="640">
+			
+		</canvas>
+
+	</div>
+
+	<img id="over"
+		style="position: absolute; left: 0px; top: 0px; z-index: 999; display: none;"
+		src="images/over.png" />
+	<script src="js/jquery-2.0.0.min.js"></script>
+
+	<script src="js/c2runtime.js"></script>
+	<script>
+		function gameOver() {
+			$("#over").show();			
+			setTimeout(function() {
+				var coin = Number(window.localStorage.getItem("H_total_coins"));
+				var distance = Number(window.localStorage.getItem("H_best_distance"));
+				var score = coin * 20 + distance * 10;
+				var level = 0;
+				var percent = 0.000;
+				if(score >= 30000){
+					level = 3;
+					coin = coin + 2000;
+					percent = score / 31000 * 100;
+					percent = percent.toFixed(3);
+					if(percent >= 99){
+						percent=99.999;
+					}
+				}else if(score < 30000 && score >= 20000){
+					level = 2;
+					coin = coin + 1000;
+					percent = score / 33000 * 100;
+					percent = percent.toFixed(3);
+				}else{
+					percent = score / 33000 * 100;
+					percent = percent.toFixed(3);
+					level = 1;
+					coin = coin + 500;
+					if(percent <= 20){
+						percent = 0.001;
+					}
+				}
+				//alert("coin:"+coin+"distance:"+distance);
+				var game_arr = {
+                game: "feiji",
+                type: 2,
+                index: 1,
+                rewardType: "score",
+                val: score,
+                level: level,
+                lastPetGame: "work_jiawu",
+                score: score,
+                percent: percent+ "%",
+                money: coin
+            };
+            console.log(JSON.stringify(game_arr));
+            window.localStorage.setItem("gameData", JSON.stringify(game_arr));
+            window.location.href = "../../../petGameResult.html";
+			}, 3000);
+		}
+		function tipsDivRe() {
+			$("#over").css("width", jQuery(window).width());
+			$("#over").css("height", jQuery(window).height());
+			
+		}
+		function initlocalStorage() {
+			window.localStorage.setItem("H_best_distance", 0);
+			window.localStorage.setItem("H_total_coins", 0);
+			window.localStorage.setItem("H_total_distance", 0);
+			window.localStorage.setItem("S_life_count", 5);
+			window.localStorage.setItem("S_magneto_count", 0);
+			window.localStorage.setItem("badge_10_temp", 0);
+			window.localStorage.setItem("badge_11_temp", 0);
+			window.localStorage.setItem("badge_12_temp", 0);
+			window.localStorage.setItem("badge_1_temp", 0);
+			window.localStorage.setItem("badge_2_temp", 0);
+			window.localStorage.setItem("badge_3_temp", 0);
+			window.localStorage.setItem("badge_4_temp", 0);
+			window.localStorage.setItem("badge_5_temp", 0);
+			window.localStorage.setItem("badge_6_temp", 0);
+			window.localStorage.setItem("badge_7_temp", 0);
+			window.localStorage.setItem("badge_8_temp", 0);
+			window.localStorage.setItem("badge_9_temp", 0);
+			window.localStorage.setItem("badges_last_change", 0);
+			window.localStorage.setItem("music_on", 0);
+			window.localStorage.setItem("new_badge_line", 0);
+			window.localStorage.setItem("sound_on", 0);
+
+		}
+
+		// Size the canvas to fill the browser viewport.
+		jQuery(window).resize(function() {
+			cr_sizeCanvas(jQuery(window).width(), jQuery(window).height());
+			tipsDivRe();
+		});
+
+		// Start the Construct 2 project running on window load.
+		jQuery(document).ready(function() {
+			initlocalStorage();
+			// Create new runtime using the c2canvas
+			cr_createRuntime("c2canvas");
+			tipsDivRe();
+			//document.body.removeChild(document.body.lastElementChild);
+		});
+
+		// Pause and resume on page becoming visible/invisible
+		function onVisibilityChanged() {
+			tipsDivRe();
+			if (document.hidden || document.mozHidden || document.webkitHidden
+					|| document.msHidden)
+				cr_setSuspended(true);
+			else
+				cr_setSuspended(false);
+		};
+
+		document.addEventListener("visibilitychange", onVisibilityChanged,
+				false);
+		document.addEventListener("mozvisibilitychange", onVisibilityChanged,
+				false);
+		document.addEventListener("webkitvisibilitychange",
+				onVisibilityChanged, false);
+		document.addEventListener("msvisibilitychange", onVisibilityChanged,
+				false);
+	</script>
+
+
+	<script>
+		function showmore() {//更多游戏
+
+		}
+		function share() {
+
+		}
+
+		function hiddenMe() {
+
+		}
+
+		function goHome() {
+
+		}
+		function clickMore() {
+			console.log("html more game");
+		}
+		function do_share() {
+		}
+		function do_Ranking() {
+
+		}
+	</script>
+</body>
+</html>
